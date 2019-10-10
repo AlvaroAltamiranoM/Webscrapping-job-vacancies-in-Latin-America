@@ -86,11 +86,11 @@ for country in countries:
             URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
             print(URL_ofertas+str(pages))
             #conducting a request of the stated URL above:
-            page = requests.get(URL, headers=headers)
+            page = requests.get(URL_ofertas, headers=headers)
             while page.status_code != 200:
                 try:
                     print ("Response not == to 200.")
-                    page = requests.get(URL_ofertas)
+                    page = requests.get(URL_ofertas, headers=headers)
                 except:
                     sleep(300)
                     print("sleeping")
@@ -102,13 +102,14 @@ for country in countries:
             #description_aux = np.array(description).T.tolist()
             #description.append(list(description))
             table_rows = table.find_all('tr')
+            detalle = {}
             for tr in table_rows:
                 td = tr.find_all('td')
-                row = [d.text.strip() for d in td]
-                details.append(row)
-                detailsdos = np.array(details).T.tolist()
-                x = np.delete(detailsdos, (0), axis=0).tolist()
- 
+                detalle['ofertas'] = line
+                detalle[td[0].text.strip()]=td[1].text.strip()
+                details.append(detalle)
+        df = pd.DataFrame.from_records(details)
+
 #Concatenando DFs, ver forma más efeciente en el futuro!
 df = pd.DataFrame([jobs, emp, local, ID, ofertas, expira]).T
 df2 = pd.DataFrame(x)
