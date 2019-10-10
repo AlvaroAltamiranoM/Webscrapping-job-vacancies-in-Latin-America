@@ -16,6 +16,20 @@ import re
 import itertools
 from datetime import date
 
+headers = {
+    'authority': 'www.tecoloco.com.gt',
+    'cache-control': 'max-age=0',
+    'dnt': '1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-user': '?1',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+    'sec-fetch-site': 'none',
+    'accept-encoding': 'gzip, deflate, br',
+    'accept-language': 'en-US,en;q=0.9,es-MX;q=0.8,es;q=0.7'
+}
+
 #countries = ['ni', 'gt', 'sv', 'hn']
 countries = ['gt']
 items_perpage = 100
@@ -23,12 +37,13 @@ for country in countries:
     #Identificar el # de ofertas activas en cada página-país en un momento dado
     URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
     #conducting a request of the stated URL above:
-    page = requests.get(URL)
+    page = requests.get(URL, headers=headers)
     #specifying a desired format of "page" using the html parser - this allows python to read the various components of the page, rather than treating it as one long string.
     soup = BeautifulSoup(page.text, "html.parser")
     Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
     print(country +' = ' + str(Ofertas_Activas))
-    
+
+
 #Parse todas las páginas y crea CSV con metadata de vacantes
 #Definir las columnas de la metadata
 jobs = []
@@ -41,14 +56,14 @@ expira = []
 for country in countries:
     URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
     print(URL)
-    page = requests.get(URL)
+    page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(page.text, "html.parser")
     Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
     for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
         URL = 'https://www.tecoloco.com.'+format(country)+'/empleos?Page='+format(pages)+'&PerPage='+format(items_perpage)
         print(URL)
         #conducting a request of the stated URL above:
-        page = requests.get(URL)
+        page = requests.get(URL, headers=headers)
         #specifying a desired format of "page" using the html parser
         soup = BeautifulSoup(page.text, "html.parser")
         #Extracting job titles
@@ -71,9 +86,9 @@ for country in countries:
             URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
             print(URL_ofertas+str(pages))
             #conducting a request of the stated URL above:
-            page = requests.get(URL_ofertas)
+            page = requests.get(URL, headers=headers)
             while page.status_code != 200:
-                try: 
+                try:
                     print ("Response not == to 200.")
                     page = requests.get(URL_ofertas)
                 except:
