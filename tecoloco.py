@@ -81,7 +81,7 @@ for country in countries:
     #Fetching el contenido de cada oferta
     for line in ofertas:
         URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
-        print(URL_ofertas+str(pages))
+        print(URL_ofertas)
         #conducting a request of the stated URL above:
         page = requests.get(URL_ofertas, headers=headers)
         while page.status_code != 200:
@@ -95,7 +95,7 @@ for country in countries:
         soup = BeautifulSoup(page.text, "html.parser")
         #Extracting job vacancies descriptions
         table = soup.find('table', attrs={'class':'detalle-oferta'})
-        description_aux = soup.find("p").text
+        #description_aux = soup.find("p").text
         #description_aux = np.array(description).T.tolist()
         #description.append(list(description))
         table_rows = table.find_all('tr')
@@ -107,7 +107,7 @@ for country in countries:
         details.append(detalle)
 details = pd.DataFrame.from_records(details)
 
-#Concatenate & export DFs
+#Merge & export DFs
 df = pd.DataFrame(list(zip(jobs, emp, local, ID, ofertas, expira)),
         columns=["Título", "Empleador", "Localidad", "ID", "ofertas", "Expira_fecha"])
 data = df.merge(details, how="left",on="ofertas" ,indicator=True, validate="1:1")
