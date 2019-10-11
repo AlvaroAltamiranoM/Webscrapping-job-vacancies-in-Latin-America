@@ -4,6 +4,7 @@ Created on Thu Oct  3 22:26:32 2019
 
 @author: ALVAROALT
 """
+
 import requests
 import bs4
 from bs4 import BeautifulSoup
@@ -43,7 +44,6 @@ for country in countries:
     Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
     print(country +' = ' + str(Ofertas_Activas))
 
-
 #Parse todas las páginas y crea CSV con metadata de vacantes
 #Definir las columnas de la metadata
 jobs = []
@@ -52,6 +52,7 @@ local = []
 ID = []
 ofertas = []
 expira = []
+details = []
 
 for country in countries:
     URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
@@ -60,7 +61,8 @@ for country in countries:
     soup = BeautifulSoup(page.text, "html.parser")
     Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
     for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
-        URL = 'https://www.tecoloco.com.'+format(country)+'/empleos?Page='+format(pages)+'&PerPage='+format(items_perpage)
+        URL = 'https://www.tecoloco.com.'+format(country)+'/empleos?Page='+\
+                format(pages)+'&PerPage='+format(items_perpage)
         print(URL)
         #conducting a request of the stated URL above:
         page = requests.get(URL, headers=headers)
@@ -79,9 +81,8 @@ for country in countries:
             ID = re.findall('[0-9]{6}',str(ID))
         for link in soup.findAll('a', href=True, text='Ver oferta'):
             ofertas.append(link['href'])
-         #Fetching el contenido de cada oferta
-        details = []
-        #description = []
+
+        #Fetching el contenido de cada oferta
         for line in ofertas:
             URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
             print(URL_ofertas+str(pages))
@@ -94,7 +95,9 @@ for country in countries:
                 except:
                     sleep(300)
                     print("sleeping")
-            #specifying a desired format of "page" using the html parser - this allows python to read the various components of the page, rather than treating it as one long string.
+            #specifying a desired format of "page" using the html parser - this
+            # allows python to read the various components of the page, rather
+            # than treating it as one long string.
             soup = BeautifulSoup(page.text, "html.parser")
             #Extracting job vacancies descriptions
             table = soup.find('table', attrs={'class':'detalle-oferta'})
@@ -107,19 +110,12 @@ for country in countries:
                 td = tr.find_all('td')
                 detalle['ofertas'] = line
                 detalle[td[0].text.strip()]=td[1].text.strip()
-                details.append(detalle)
-        df = pd.DataFrame.from_records(details)
+            details.append(detalle)
+    details = pd.DataFrame.from_records(details)
 
-#Concatenando DFs, ver forma más efeciente en el futuro!
-df = pd.DataFrame([jobs, emp, local, ID, ofertas, expira]).T
-df2 = pd.DataFrame(x)
-#df2 = np.reshape(df2.values,(Ofertas_Activas,12))
-df2 = np.reshape(df2.values,(232,12))
-df2 = pd.DataFrame(df2)
-dfF = pd.concat([df, df2], axis=1)
-dfF['Date'] = pd.to_datetime(date.today())
-dfF.columns = ["Título", "Empleador", "Localidad", "ID", "Link_oferta", "Expira_fecha", "Area de la empresa", "Cargo", "Puestos vacantes", "Tipo de contrato", "Experiencia requerida", "Género", "Edad", "W_máximo", "W_mínimo", "Requiere_vehículo", "País", "Departamento", "Fecha de extracción"]
-dfF.to_csv(r'Nicaragua.csv')
-
-del ([jobs, emp, local, ID, ofertas, expira])
-
+    #Concatenate & export DFs
+    df = pd.DataFrame(list(zip(jobs, emp, local, ID, ofertas, expira)),
+            columns=["jobs", "emp", "local","ID", "ofertas","expira"])
+    data = df.merge(details, how="left",on="ofertas" ,indicator=True)
+    data['Date'] = date.today()
+    data.to_csv(r'tecoloco_{0}.csv'.format(country))
