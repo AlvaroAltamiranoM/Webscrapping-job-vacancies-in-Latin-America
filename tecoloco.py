@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 from time import sleep
-import datetime
 import re
 from datetime import date
 
@@ -45,7 +44,6 @@ for country in countries:
 for country in countries:
     jobs = []
     emp = []
-    local = []
     ID = []
     ofertas = []
     expira = []
@@ -68,7 +66,6 @@ for country in countries:
             jobs.append(div.find(name = "a").text)
         for div in soup.find_all(name = "div",attrs = {"class":"job-result-overview"}):
             emp.append(div.find("li").text)
-            local.append(div.find(itemprop="jobLocation").text)
             expira.append(div.find(itemprop="datePosted").text)
             expira = re.findall(r'(\d+/\d+/\d+)',str(expira))
         for div in soup.find_all(name = "div",attrs = {"class":"job-result-cta result-page"}):
@@ -107,8 +104,8 @@ for country in countries:
     details = pd.DataFrame.from_records(details)
 
     #Merge & export DFs
-    df = pd.DataFrame(list(zip(jobs, emp, local, ID, ofertas, expira)),
-            columns=["Título", "Empleador", "Localidad", "ID", "ofertas", "Expira_fecha"])
+    df = pd.DataFrame(list(zip(jobs, emp, ID, ofertas, expira)),
+            columns=["Título", "Empleador", "ID", "ofertas", "Expira_fecha"])
     data = df.merge(details, how="left",on="ofertas" ,indicator=True, validate="1:1")
     data['Date'] = date.today()
     data.to_csv(r'tecoloco_{0}_{1}.csv'.format(country, date.today()))
