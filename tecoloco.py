@@ -28,7 +28,7 @@ headers = {
     'accept-language': 'en-US,en;q=0.9,es-MX;q=0.8,es;q=0.7'
 }
 
-countries = ['ni', 'gt', 'sv', 'hn', 'do']
+countries = ['do', 'ni', 'hn', 'gt', 'sv']
 items_perpage = 100
 for country in countries:
     #Identificar el # de ofertas activas en cada página-país en un momento dado
@@ -48,7 +48,6 @@ local = []
 ID = []
 ofertas = []
 expira = []
-details = []
 
 for country in countries:
     URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
@@ -79,6 +78,7 @@ for country in countries:
             ofertas.append(link['href'])
 
     #Fetching el contenido de cada oferta
+    details = []
     for line in ofertas:
         URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
         print(URL_ofertas)
@@ -105,11 +105,11 @@ for country in countries:
             detalle['ofertas'] = line
             detalle[td[0].text.strip()]=td[1].text.strip()
         details.append(detalle)
-details = pd.DataFrame.from_records(details)
+    details = pd.DataFrame.from_records(details)
 
-#Merge & export DFs
-df = pd.DataFrame(list(zip(jobs, emp, local, ID, ofertas, expira)),
-        columns=["Título", "Empleador", "Localidad", "ID", "ofertas", "Expira_fecha"])
-data = df.merge(details, how="left",on="ofertas" ,indicator=True, validate="1:1")
-data['Date'] = date.today()
-data.to_csv(r'tecoloco_{0}_{1}.csv'.format(country, date.today()))
+    #Merge & export DFs
+    df = pd.DataFrame(list(zip(jobs, emp, local, ID, ofertas, expira)),
+            columns=["Título", "Empleador", "Localidad", "ID", "ofertas", "Expira_fecha"])
+    data = df.merge(details, how="left",on="ofertas" ,indicator=True, validate="1:1")
+    data['Date'] = date.today()
+    data.to_csv(r'tecoloco_{0}_{1}.csv'.format(country, date.today()))
