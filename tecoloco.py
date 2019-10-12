@@ -42,14 +42,14 @@ for country in countries:
 
 #Parse todas las páginas y crea CSV con metadata de vacantes
 #Definir las columnas de la metadata
-jobs = []
-emp = []
-local = []
-ID = []
-ofertas = []
-expira = []
-
 for country in countries:
+    jobs = []
+    emp = []
+    local = []
+    ID = []
+    ofertas = []
+    expira = []
+    details = []
     URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
     print(URL)
     page = requests.get(URL, headers=headers)
@@ -78,7 +78,6 @@ for country in countries:
             ofertas.append(link['href'])
 
     #Fetching el contenido de cada oferta
-    details = []
     for line in ofertas:
         URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
         print(URL_ofertas)
