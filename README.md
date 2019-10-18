@@ -1,2 +1,7 @@
 # Webscrapping-job-vacancies-in-Central-America
-Webscrapping job vacancies in Central America's northern triangle to create a vacancies time series and apply ML to create skill contents variables/indicators
+
+#About
+This project webscrappes online job vacancies webpages in Central America. 
+Its aim is twofold: 
+(i) to create a vacancies time series, and
+(ii) to apply ML to create skill contents variables/indicators from that data.
