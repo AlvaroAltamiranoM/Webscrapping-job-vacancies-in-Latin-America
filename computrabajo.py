@@ -65,7 +65,7 @@ page = requests.get(URL, headers=headers)
 soup = BeautifulSoup(page.text, "html.parser")
 Ofertas_Activas = soup.find(class_ = "breadtitle_mvl").text
 Ofertas_Activas = int(''.join(filter(str.isdigit, Ofertas_Activas)))
-    
+
 for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
     URL = 'https://www.computrabajo.com.'+format(country)+'/ofertas-de-trabajo/?p='+format(pages)
     print(URL)
@@ -84,47 +84,29 @@ for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
 #Fetching el contenido de cada oferta
 emp = []
 local = []
+details = []
+
 for line in ofertas:
-    URL_ofertas = 'https://www.computrabajo.com.'+format(country)+format(line)
-    print(URL_ofertas)
+    detalle = {}
+    detalle["URL_ofertas"] = 'https://www.computrabajo.com.'+format(country)+format(line)
     #conducting a request of the stated URL above:
-    page = requests.get(URL_ofertas, headers=headers)
-# =============================================================================
-#     while page.status_code != 200:
-#         try:
-#             sleep(5)
-#             print("sleeping")
-#             page = requests.get(URL_ofertas, headers=headers)
-#             print ("Response not == to 200.")
-#         except Exception as e:
-#             print(e) 
-# =============================================================================
-#specifying a desired format of "page" using the html parser
+    page = requests.get(detalle["URL_ofertas"], headers=headers)
     soup = BeautifulSoup(page.text, "html.parser")
-    try:
-        emp.append(soup.find(id = 'urlverofertas').text.strip())
-    except Exception as e: 
-        emp.append("")
-        print(e)
-    try:
-        local.append(soup.select("div.cm-8.breadcrumb > ol > li:nth-of-type(2) > a")[0].get_text(strip=True))
-    except Exception as e: 
-        local.append("")
-        print(e)
+    detalle["puesto"] = soup.find(name="section", class_ = 'cm-8 box detalle_oferta box_image').\
+            find_all("h1")[0].text
 
+    box = soup.find(name="section", class_ = 'box box_r').find_all("li")
+    for element in box:
+        try:
+            detalle[element.find("h3").text] = element.find("p").\
+                    text.replace(' +',' ')
+        except:
+            pass
 
+     detalle["descripcion"] = soup.find(name="div", class_ = 'cm-12 box_i bWord').\
+             find_all("li")[0].text
+    details.append(detalle)
 
-
-
-
-
-
-
-
-
-
-
-
-
+detailsdb = pd.DataFrame.from_records(details)
 
 
