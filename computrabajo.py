@@ -86,9 +86,12 @@ for line in URL_ofertas:
     #Nombre del puesto y local (departamento)
     try:
         local.append(soup.select("div.cm-8.breadcrumb > ol > li:nth-of-type(2) > a")[0].get_text(strip=True))
-        emp.append(soup.find(id = 'urlverofertas').text.strip())
     except: 
         pass
+    try:
+        emp.append(soup.find(id = 'urlverofertas').text.strip())
+    except: 
+        emp.append("")
     box = soup.find(name="section", class_ = 'box box_r').find_all("li")
     for element in box:
         try:
