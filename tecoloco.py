@@ -77,7 +77,6 @@ for country in countries:
     #Fetching el contenido de cada oferta
     for line in ofertas:
         URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
-        print(URL_ofertas)
         #conducting a request of the stated URL above:
         page = requests.get(URL_ofertas, headers=headers)
         while page.status_code != 200:
