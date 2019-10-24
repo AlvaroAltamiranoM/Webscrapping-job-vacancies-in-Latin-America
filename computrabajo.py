@@ -96,7 +96,7 @@ for line in URL_ofertas:
                     text.replace(' +',' ').strip()
         except:
             pass
-     detalle["descripcion"] = soup.find(name="div", class_ = 'cm-12 box_i bWord').\
+    detalle["descripcion"] = soup.find(name="div", class_ = 'cm-12 box_i bWord').\
              find_all("li")[0].text
     details.append(detalle)
 
