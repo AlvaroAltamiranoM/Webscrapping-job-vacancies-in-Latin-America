@@ -108,7 +108,7 @@ df = pd.DataFrame(list(zip(jobs, emp, local, URL_ofertas)),
             columns=["Título", "Empleador", "Departamento", "URL_ofertas"])
 detailsdb = pd.DataFrame.from_records(details)
 detailsdb = detailsdb.drop(columns = ['Empresa','Localización']) 
-data = df.merge(detailsdb, how="left",on="URL_ofertas" ,indicator=True, validate="1:1")
+data = df.merge(detailsdb, how="left",on="URL_ofertas" ,indicator=True)
 
 data['Date'] = date.today()
 data.to_csv(r'computrabajo_{0}_{1}.csv'.format(country, date.today()))
