@@ -30,7 +30,7 @@ headers = {
 
 #countries = ['hn', 'ni', 'pa', 'do', 'gt']
 items_perpage = 20
-countries = ['hn']
+countries = ['ni']
 for country in countries:
     jobs = []
     URL_ofertas = []
@@ -69,7 +69,9 @@ for country in countries:
     emp = []
     local = []
     details = []
-
+    df1 = pd.DataFrame()
+    new =  []   
+    
     for line in URL_ofertas:
         detalle = {}
         detalle["URL_ofertas"] = 'https://www.computrabajo.com.'+format(country)+format(line)
@@ -97,9 +99,23 @@ for country in countries:
                         text.replace(' +',' ').strip()
             except:
                 pass
-        detalle["descripcion"] = soup.find(name="div", class_ = 'cm-12 box_i bWord').\
-                 find_all("li")[0].text
+        tipos2 = ["cm-12 box_i bWord", "cm-12 box_i"]
+        for t in tipos2:
+            try:
+                detalle["descripcion"] = soup.find(name="div", class_ = format(t)).\
+                     find_all("li")[0].text
+            except:
+                pass
         details.append(detalle)
+        
+        requer = []
+        for div in soup.find_all(name = "div",class_ = 'cm-12 box_i bWord'):
+            for childdiv in div.find_all("li"):
+                requer.append(childdiv.string)
+        df1 = pd.DataFrame(requer)
+        df1.dropna(inplace = True)
+        new = df1[0].str.split(":", n = 0, expand = True).T
+        new.append(new.iloc[1])
 
     #Create and merge dataframes
     df = pd.DataFrame(list(zip(jobs, emp, local, URL_ofertas)),
