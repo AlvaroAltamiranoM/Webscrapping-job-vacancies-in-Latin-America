@@ -119,7 +119,7 @@ for country in countries:
                 components = soup.find(name = "div",class_ = 'cm-12 box_i bWord')
                 for element in components.find_all("li"):
                     try:
-                        if element.find("h3").text == None:
+                        if element.find("h3") != None:
                             pass
                         else:
                             a, b = element.text.split(":")
