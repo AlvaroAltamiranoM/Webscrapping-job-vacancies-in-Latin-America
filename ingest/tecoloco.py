@@ -2,7 +2,7 @@
 """
 Created on Thu Oct  3 22:26:32 2019
 
-@author: ALVAROALT
+@authors: ALVAROALT & rsanchezavalos
 """
 import re
 import requests
