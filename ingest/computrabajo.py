@@ -29,9 +29,10 @@ headers = {
     'accept-language': 'en-US,en;q=0.9,es-MX;q=0.8,es;q=0.7'
 }
 
-#countries = ['hn', 'ni', 'pa', 'do', 'gt']
+#countries = ['ni']
+countries = ['ni', 'hn', 'pa', 'do', 'gt', 'co', 'mx', 'ar', 'pe', 'cl', 'ec', 'uy', 'py', 'bo']
 items_perpage = 20
-countries = ['ni']
+
 for country in countries:
     jobs = []
     URL_ofertas = []
@@ -94,7 +95,10 @@ for country in countries:
             detalle["Empleador"] = soup.find(id = 'urlverofertas').text.strip()
         except:
             pass
-        box = soup.find(name="section", class_ = 'box box_r').find_all("li")
+        try:
+            box = soup.find(name="section", class_ = 'box box_r').find_all("li")
+        except:
+            pass
         for element in box:
             try:
                 a = element.find("p").text.replace(' +',' ').strip()
@@ -110,23 +114,26 @@ for country in countries:
                 detalle["descripcion"] = text_to_unicode(a)
             except:
                 pass
-        components = soup.find(name = "div",class_ = 'cm-12 box_i bWord')
-        for element in components.find_all("li"):
+        for t in tipos2:
             try:
-                if element.find("h3").text != '':
-                    pass
-                else:
-                    a, b = element.text.split(":")
-                    detalle[text_to_unicode(a)] =text_to_unicode(b)
+                components = soup.find(name = "div",class_ = 'cm-12 box_i bWord')
+                for element in components.find_all("li"):
+                    try:
+                        if element.find("h3").text == None:
+                            pass
+                        else:
+                            a, b = element.text.split(":")
+                            detalle[text_to_unicode(a)] =text_to_unicode(b)
+                        except:
+                            pass
             except:
                 pass
         details.append(detalle)
 
     #Create and merge dataframes
     data = pd.DataFrame.from_records(details)
-    #detailsdb = detailsdb.drop(columns = ['Empresa','Localización'])
-    #data = df.merge(detailsdb, how="left",on="URL_ofertas" ,indicator=True)
-
+    data = data.drop(columns = ['Empresa','Localización'])
+    
     data['Date'] = date.today()
     data.to_csv(r'computrabajo_{0}_{1}.csv'.format(country, date.today()))
 
