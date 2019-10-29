@@ -4,14 +4,15 @@ Created on Thu Oct  3 22:26:32 2019
 
 @author: ALVAROALT
 """
-
+import re
 import requests
+
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 from time import sleep
-import re
 from datetime import date
+from ingest.utils import *
 
 headers = {
     'authority': 'www.tecoloco.com',

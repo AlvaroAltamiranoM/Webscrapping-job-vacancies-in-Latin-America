@@ -2,7 +2,7 @@
 """
 Created on Wed Oct 16 22:29:27 2019
 
-@author: ALVAROALT
+@author: ALVAROALT & rsanchezavalos
 """
 
 import requests
@@ -13,6 +13,7 @@ from time import sleep
 import re
 from datetime import date
 import urllib
+from ingest.utils import *
 
 headers = {
     'authority': 'www.computrabajo.com',
@@ -66,12 +67,8 @@ for country in countries:
             URL_ofertas.append(link['href'])
 
     #Fetching el contenido de cada oferta
-    emp = []
-    local = []
     details = []
-    df1 = pd.DataFrame()
-    new =  []   
-    
+
     for line in URL_ofertas:
         detalle = {}
         detalle["URL_ofertas"] = 'https://www.computrabajo.com.'+format(country)+format(line)
@@ -83,46 +80,52 @@ for country in countries:
         except:
             pass
         soup = BeautifulSoup(page.text, "html.parser")
+        try:
+            aux = soup.find(class_="cm-8 box detalle_oferta box_image").find("h1").text
+            detalle["Puesto"] = re.sub("\r|\n|\s\s+",'',aux)
+        except:
+            pass
         #Nombre del puesto y local (departamento)
         try:
-            local.append(soup.select("div.cm-8.breadcrumb > ol > li:nth-of-type(2) > a")[0].get_text(strip=True))
-        except: 
+            detalle["Departamento"] = soup.select("div.cm-8.breadcrumb > ol > li:nth-of-type(2) > a")[0].get_text(strip=True)
+        except:
             pass
         try:
-            emp.append(soup.find(id = 'urlverofertas').text.strip())
-        except: 
-            emp.append("")
+            detalle["Empleador"] = soup.find(id = 'urlverofertas').text.strip()
+        except:
+            pass
         box = soup.find(name="section", class_ = 'box box_r').find_all("li")
         for element in box:
             try:
-                detalle[element.find("h3").text] = element.find("p").\
-                        text.replace(' +',' ').strip()
+                a = element.find("p").text.replace(' +',' ').strip()
+                detalle[element.find("h3").text] = text_to_unicode(a)
             except:
                 pass
         tipos2 = ["cm-12 box_i bWord", "cm-12 box_i"]
         for t in tipos2:
             try:
-                detalle["descripcion"] = soup.find(name="div", class_ = format(t)).\
-                     find_all("li")[0].text
+                a = soup.find(name="div", class_ =
+                              format(t)).find_all("li")[0].text.\
+                    replace('\nDescripción\r\n ', '').strip()
+                detalle["descripcion"] = text_to_unicode(a)
+            except:
+                pass
+        components = soup.find(name = "div",class_ = 'cm-12 box_i bWord')
+        for element in components.find_all("li"):
+            try:
+                if element.find("h3").text != '':
+                    pass
+                else:
+                    a, b = element.text.split(":")
+                    detalle[text_to_unicode(a)] =text_to_unicode(b)
             except:
                 pass
         details.append(detalle)
-        
-        requer = []
-        for div in soup.find_all(name = "div",class_ = 'cm-12 box_i bWord'):
-            for childdiv in div.find_all("li"):
-                requer.append(childdiv.string)
-        df1 = pd.DataFrame(requer)
-        df1.dropna(inplace = True)
-        new = df1[0].str.split(":", n = 0, expand = True).T
-        new.append(new.iloc[1])
 
     #Create and merge dataframes
-    df = pd.DataFrame(list(zip(jobs, emp, local, URL_ofertas)),
-                columns=["Título", "Empleador", "Departamento", "URL_ofertas"])
-    detailsdb = pd.DataFrame.from_records(details)
-    detailsdb = detailsdb.drop(columns = ['Empresa','Localización']) 
-    data = df.merge(detailsdb, how="left",on="URL_ofertas" ,indicator=True)
+    data = pd.DataFrame.from_records(details)
+    #detailsdb = detailsdb.drop(columns = ['Empresa','Localización'])
+    #data = df.merge(detailsdb, how="left",on="URL_ofertas" ,indicator=True)
 
     data['Date'] = date.today()
     data.to_csv(r'computrabajo_{0}_{1}.csv'.format(country, date.today()))
