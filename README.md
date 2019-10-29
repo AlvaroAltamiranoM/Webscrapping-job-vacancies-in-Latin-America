@@ -1,8 +1,8 @@
-# Webscrapping-job-vacancies-in-Central-America
+# Webscrapping-job-vacancies-in-Latin-America
 
 #About
 
-This project webscrappes online job vacancies webpages in Central America. 
+This project webscrappes online job vacancies webpages in Latin America. 
 
 #Justification
 
