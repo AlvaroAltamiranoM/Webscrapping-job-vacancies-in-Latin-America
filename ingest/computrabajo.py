@@ -76,10 +76,14 @@ for country in countries:
         detalle["URL_ofertas"] = detalle["URL_ofertas"].replace("\t"," ")
         detalle["URL_ofertas"] = urllib.parse.quote(detalle["URL_ofertas"], safe="%/:=&?~#+!$,;'@()*[]", encoding = 'utf-8')
         #conducting a request of the stated URL above:
-        try:
-            page = requests.get(detalle["URL_ofertas"], headers=headers)
-        except:
-            pass
+        page = requests.get(detalle["URL_ofertas"], headers=headers)
+        while page.status_code != 200:
+            try:
+                print ("Response not == to 200.")
+                page = requests.get(detalle["URL_ofertas"], headers=headers)
+            except:
+                sleep(300)
+            print("sleeping")
         soup = BeautifulSoup(page.text, "html.parser")
         try:
             aux = soup.find(class_="cm-8 box detalle_oferta box_image").find("h1").text
@@ -124,8 +128,8 @@ for country in countries:
                         else:
                             a, b = element.text.split(":")
                             detalle[text_to_unicode(a)] =text_to_unicode(b)
-                        except:
-                            pass
+                    except:
+                        pass
             except:
                 pass
         details.append(detalle)
