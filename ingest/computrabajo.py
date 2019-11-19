@@ -123,8 +123,8 @@ for country in countries:
                 pass
         for element in box:
             try:
-                if country=='cl' or country=='ar' or country=='mx' or country=='ar':
-                    a = element.find_all("p")[1].text.replace(' +',' ').strip()
+                if country=='cl' or country=='ar' or country=='mx' or country=='co':
+                    a = element.find_all("p").text.replace(' +',' ').strip()
                     detalle[element.find(class_ = "fw_b fs15 mt10").text] = text_to_unicode(a)                  
                 else:
                     a = element.find("p").text.replace(' +',' ').strip()
