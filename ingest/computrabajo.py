@@ -164,8 +164,13 @@ for country in countries:
 
     #Create and merge dataframes
     df = pd.DataFrame(list(zip(jobs,URL_ofertas)), columns=["puesto2", "url_oferta"])
-    
-    data = pd.DataFrame.from_records(details)
+
+    data = pd.DataFrame(details, columns = ["Anos de experiencia", "Cantidad de vacantes", "Departamento", 
+                                            "Disponibilidad de cambio de residencia","Disponibilidad de viajar",
+                                            "Educacion minima", "Empleador", "Fecha de contratacion",
+                                            "Idiomas", "Jornada", "Licencias de conducir", "Puesto", "Salario",
+                                            "Tipo de contrato", "URL_ofertas", "descripcion"])
+
     data.rename(columns = {'Anos de experiencia':'anios_de_experiencia', 'Cantidad de Vacantes':'cantidad_de_vacantes', 
                            'Departamento':'departamento', 'Disponibilidad de Cambio de Residencia':'cambio_de_residencia',
                            'Disponibilidad de Viajar':'disponibilidad_viajes', 'Educacion Minima':'educacion_minima', 
@@ -179,17 +184,5 @@ for country in countries:
     data.to_csv(r'computrabajo_{0}_{1}.csv'.format(country, date.today()))
     
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
