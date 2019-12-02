@@ -9,7 +9,6 @@ import requests
 
 from bs4 import BeautifulSoup
 import pandas as pd
-import numpy as np
 from time import sleep
 from datetime import date
 from ingest.utils import *
@@ -32,57 +31,63 @@ countries = ['do', 'ni', 'hn', 'gt', 'sv']
 items_perpage = 100
 for country in countries:
     #Identificar el # de ofertas activas en cada página-país en un momento dado
-    URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
+    URL = 'https://www.tecoloco.com.' + format(country)+'/empleos'
     #conducting a request of the stated URL above:
     page = requests.get(URL, headers=headers)
     #specifying a desired format of "page" using the html parser    soup = BeautifulSoup(page.text, "html.parser")
     soup = BeautifulSoup(page.text, "html.parser")
-    Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
-    print(country +' = ' + str(Ofertas_Activas))
+    Ofertas_Activas = int(soup.find(class_="ofertasactivas").text)
+    print(country + ' = ' + str(Ofertas_Activas))
 
 #Parse todas las páginas y crea CSV con metadata de vacantes
 #Definir las columnas de la metadata
 for country in countries:
+    # Load history
+    history = pd.read_csv(r'tecoloco_{0}.csv'.format(country))
+    id_history = history.ofertas
     jobs = []
     emp = []
     ID = []
     ofertas = []
     expira = []
     details = []
-    URL = 'https://www.tecoloco.com.'+format(country)+'/empleos'
+    URL = 'https://www.tecoloco.com.' + format(country) + '/empleos'
     print(URL)
     page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(page.text, "html.parser")
     Ofertas_Activas = int(soup.find(class_ = "ofertasactivas").text)
-    for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
-        URL = 'https://www.tecoloco.com.'+format(country)+'/empleos?Page='+\
-                format(pages)+'&PerPage='+format(items_perpage)
+    for pages in range(1, int((Ofertas_Activas / items_perpage) + 2)):
+        URL = 'https://www.tecoloco.com.' + format(country) + '/empleos?Page=' +\
+            format(pages) +'&PerPage=' + format(items_perpage)
         print(URL)
         #conducting a request of the stated URL above:
         page = requests.get(URL, headers=headers)
         #specifying a desired format of "page" using the html parser
         soup = BeautifulSoup(page.text, "html.parser")
         #Extracting job titles
-        for div in soup.find_all(name = "div",attrs = {"class":"job-result-title"}):
-            jobs.append(div.find(name = "a").text)
-        for div in soup.find_all(name = "div",attrs = {"class":"job-result-overview"}):
+        for div in soup.find_all(name="div", attrs={"class": "job-result-title"}):
+            jobs.append(div.find(name="a").text)
+        for div in soup.find_all(name="div", attrs={"class": "job-result-overview"}):
             emp.append(div.find("li").text)
             expira.append(div.find(itemprop="datePosted").text)
-            expira = re.findall(r'(\d+/\d+/\d+)',str(expira))
-        for div in soup.find_all(name = "div",attrs = {"class":"job-result-cta result-page"}):
+            expira = re.findall(r'(\d+/\d+/\d+)', str(expira))
+        for div in soup.find_all(name="div", attrs={"class": "job-result-cta result-page"}):
             ID.append(div.find("a", {"jobid": True}))
-            ID = re.findall('[0-9]{6}',str(ID))
+            ID = re.findall('[0-9]{6}', str(ID))
         for link in soup.findAll('a', href=True, text='Ver oferta'):
             ofertas.append(link['href'])
 
+    # Query only new ofertas
+    ofertas_ = list(set(ofertas) - set(id_history))
+
     #Fetching el contenido de cada oferta
-    for line in ofertas:
-        URL_ofertas = 'https://www.tecoloco.com.'+format(country)+format(line)
+    for line in ofertas_:
+        URL_ofertas = 'https://www.tecoloco.com.' + format(country) + format(line)
         #conducting a request of the stated URL above:
         page = requests.get(URL_ofertas, headers=headers)
         while page.status_code != 200:
             try:
-                print ("Response not == to 200.")
+                print("Response not == to 200.")
                 page = requests.get(URL_ofertas, headers=headers)
             except:
                 sleep(120)
@@ -90,7 +95,7 @@ for country in countries:
         #specifying a desired format of "page" using the html parser
         soup = BeautifulSoup(page.text, "html.parser")
         #Extracting job vacancies descriptions
-        table = soup.find('table', attrs={'class':'detalle-oferta'})
+        table = soup.find('table', attrs={'class': 'detalle-oferta'})
         #description_aux = soup.find("p").text
         #description_aux = np.array(description).T.tolist()
         #description.append(list(description))
@@ -99,13 +104,13 @@ for country in countries:
         for tr in table_rows:
             td = tr.find_all('td')
             detalle['ofertas'] = line
-            detalle[td[0].text.strip()]=td[1].text.strip()
+            detalle[td[0].text.strip()] = td[1].text.strip()
         details.append(detalle)
     details = pd.DataFrame.from_records(details)
 
     #Merge & export DFs
     df = pd.DataFrame(list(zip(jobs, emp, ID, ofertas, expira)),
             columns=["Título", "Empleador", "ID", "ofertas", "Expira_fecha"])
-    data = df.merge(details, how="left",on="ofertas" ,indicator=True, validate="1:1")
+    data = df.merge(details, how="left", on="ofertas", indicator=True)
     data['Date'] = date.today()
-    data.to_csv(r'tecoloco_{0}_{1}.csv'.format(country, date.today()))
+    history.append(data).to_csv(r'tecoloco_{0}.csv'.format(country))
