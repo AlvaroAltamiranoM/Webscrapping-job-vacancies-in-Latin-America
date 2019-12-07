@@ -105,12 +105,27 @@ for country in countries:
             td = tr.find_all('td')
             detalle['ofertas'] = line
             detalle[td[0].text.strip()] = td[1].text.strip()
+        #Descripcion del puesto
+        try:
+            detalle["descripcion"] = soup.select("div.job-description > span > div.job-details > div:nth-child(2)")[0].\
+            get_text(strip=True).replace('Descripción de la Oferta', '')
+        except:
+            pass       
         details.append(detalle)
     details = pd.DataFrame.from_records(details)
 
     #Merge & export DFs
-    df = pd.DataFrame(list(zip(jobs, emp, ID, ofertas, expira)),
-            columns=["Título", "Empleador", "ID", "ofertas", "Expira_fecha"])
+        df = pd.DataFrame(list(zip(jobs, emp, ID, ofertas, expira)),
+            columns=["Empleador", "ofertas", "Expira_fecha"])
     data = df.merge(details, how="left", on="ofertas", indicator=True)
+
+    data.rename(columns = {'Nivel de Experiencia':'anios_de_experiencia', 'Puestos Vacantes':'cantidad_de_vacantes',
+                           'Departamento':'departamento', 'Educacion minima':'educacion_minima',
+                           'Empleador':'empresa', 'Área de la Empresa': 'area_empresa', 
+                           'Vehículo': 'vehiculo','Cargo Solicitado':'puesto', 'Salario máximo (USD)':'salario_max',
+                           'Salario minimo (USD)':'salario_min',
+                           'Tipo de contratación':'tipo_de_cotrato', 'ofertas':'url_oferta', 
+                           'descripcion':'descripcion'}, inplace = True)
+
     data['Date'] = date.today()
     history.append(data).to_csv(r'tecoloco_{0}.csv'.format(country))
