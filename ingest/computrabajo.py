@@ -176,7 +176,7 @@ for country in countries:
                            'Disponibilidad de Viajar':'disponibilidad_viajes', 'Educacion Minima':'educacion_minima', 
                            'Empleador':'empresa', 'Fecha de Contratacion':'fecha_de_contratacion', 'Idiomas':'idiomas', 
                            'Jornada':'jornada', 'Licencias de conducir':'licencia_conducir', 'Puesto':'puesto', 'Salario':'salario',
-                           'Tipo de contrato':'tipo_de_cotrato', 'URL_ofertas':'url_oferta', 'descripcion':'descripcion'}, inplace = True)
+                           'Tipo de contrato':'tipo_de_contrato', 'URL_ofertas':'url_oferta', 'descripcion':'descripcion'}, inplace = True)
     #data = data.drop(columns = ['puesto','Localización'])
     data['puesto'] = df['puesto2']
     data['date'] = date.today()
