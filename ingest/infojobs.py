@@ -62,20 +62,27 @@ for pages in range(1,2):
     details = []
     for line in URL_ofertas:
         detalle = {}
-        detalle["URL_ofertas"] = 'https://www.infojobs.com.br/empregos.aspx'
-        detalle["URL_ofertas"] = detalle["URL_ofertas"]
+        detalle["URL_ofertas"] = line
         detalle["URL_ofertas"] = detalle["URL_ofertas"].replace("\t"," ")
         detalle["URL_ofertas"] = urllib.parse.quote(detalle["URL_ofertas"], safe="%/:=&?~#+!$,;'@()*[]", encoding = 'utf-8')
         #conducting a request of the stated URL above:
         page = requests.get(detalle["URL_ofertas"], headers=headers, verify=False)
         soup = BeautifulSoup(page.text, "html.parser")
         #detalle["Sopa_de_queso"] = soup
-        ctl00_phMasterPage_cVacancySummary_litVacancyTitle
-        try:
-            aux = soup.find(class_="cm-8 box detalle_oferta box_image").find("h1").text
-            detalle["Puesto"] = re.sub("\r|\n|\s\s+",'',aux)
-        except:
-            pass
+        tipos_box = ["advisor-card advisor-vacancy-content advisor-vacancy-summary"]
+        for t in tipos_box:
+            try:
+                box = soup.find(name="div", class_ = format(t)).find_all("li")
+            except:
+                pass
+        for element in box:
+            try:
+                a = element.find("span").text.replace(' +',' ').strip()
+                detalle[element.find("strong").text] = text_to_unicode(a)
+            except:
+                pass
+
+        
         #Nombre del puesto y local (departamento)
         try:
             detalle["Departamento"] = soup.select("div.cm-8.breadcrumb > ol > li:nth-of-type(2) > a")[0].get_text(strip=True)
