@@ -92,6 +92,16 @@ for line in URL_ofertas:
         text.replace(' +',' ').strip()
     except:
         pass
+    try:
+        detalle["Licencias de conducir"] = soup.find(id = 'ctl00_phMasterPage_cVacancyManager_cVacancyRequeriments_liDrive').\
+        text.replace('Habilitação para dirigir ',' ').strip()
+    except:
+        pass
+    try:
+        detalle["Vehículo"] = soup.find(id = 'ctl00_phMasterPage_cVacancyManager_cVacancyRequeriments_liCar').\
+        text.strip()
+    except:
+        pass
     #Variables del box izquierdo (descripcion de la vacantes)
     tipos2 = ["descriptionItems"]
     for t in tipos2:
@@ -105,6 +115,21 @@ for line in URL_ofertas:
                     pass
         except:
             pass
+#Para personas con discapcidad
+# =============================================================================
+#     tipos3 = ["ctl00_phMasterPage_cVacancyManager_cVacancyDeficiencies_liDeficiencies"]
+#     for t in tipos3:
+#         try:
+#             components_discapacidad = soup.find(name = "ol", id = format(t))
+#             for element in components_discapacidad.find_all("li"):
+#                 try:
+#                     a, b = element.text.split(":")
+#                     detalle[text_to_unicode(a)] =text_to_unicode(b)
+#                 except:
+#                     pass
+#         except:
+#             pass
+# =============================================================================
         
        # UM DE DESCRICAO QUE PEGUE TODOS OS CAMPOS DESSA SECAO
     details.append(detalle)
