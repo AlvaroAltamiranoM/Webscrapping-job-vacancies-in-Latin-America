@@ -43,8 +43,8 @@ items_perpage = 16
 
 jobs = []
 URL_ofertas = []
-#for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
-for pages in range(1,3):
+for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
+#for pages in range(1,3):
     URL = 'https://www.infojobs.com.br/empregos.aspx?Page='+format(pages)
     print(URL)
     #conducting a request of the stated URL above:
@@ -106,7 +106,7 @@ for line in URL_ofertas:
         except:
             pass
         
-        UM DE DESCRICAO QUE PEGUE TODOS OS CAMPOS DESSA SECAO
+       # UM DE DESCRICAO QUE PEGUE TODOS OS CAMPOS DESSA SECAO
     details.append(detalle)
 
 #Creacion de dataframes y export a CSVs
