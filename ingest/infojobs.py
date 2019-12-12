@@ -44,7 +44,7 @@ items_perpage = 16
 jobs = []
 URL_ofertas = []
 for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
-#for pages in range(1,3):
+#for pages in range(16,19):
     URL = 'https://www.infojobs.com.br/empregos.aspx?Page='+format(pages)
     print(URL)
     #conducting a request of the stated URL above:
@@ -95,6 +95,7 @@ for line in URL_ofertas:
     try:
         detalle["Licencias de conducir"] = soup.find(id = 'ctl00_phMasterPage_cVacancyManager_cVacancyRequeriments_liDrive').\
         text.replace('Habilitação para dirigir ',' ').strip()
+        detalle["Licencias de conducir"] = 1
     except:
         pass
     try:
@@ -115,6 +116,12 @@ for line in URL_ofertas:
                     pass
         except:
             pass
+    try:
+        detalle["descripcion"] = soup.select("#ctl00_phMasterPage_divVacancy > div.advisor-vacancy-content > ol:nth-child(2)")[0].\
+        get_text(strip=True).replace('Área e especialização profissional:', '')
+    except:
+        pass       
+
 #Para personas con discapcidad
 # =============================================================================
 #     tipos3 = ["ctl00_phMasterPage_cVacancyManager_cVacancyDeficiencies_liDeficiencies"]
@@ -131,20 +138,20 @@ for line in URL_ofertas:
 #             pass
 # =============================================================================
         
-       # UM DE DESCRICAO QUE PEGUE TODOS OS CAMPOS DESSA SECAO
     details.append(detalle)
 
 #Creacion de dataframes y export a CSVs
 data = pd.DataFrame(details, columns = ["Area e especializacao profissional", "Numero de vagas", "Localidade", 
-                                        "Nivel hierarquico","Educacion minima", "Empleador", "Fecha de contratacion",
-                                        "Idiomas", "Jornada", "Título da vaga", "Salário", "Tipo de contrato", 
-                                        "URL_ofertas", "pais"])
+                                        "Nivel hierarquico","Educacion minima", "Empleador", "Idiomas", 
+                                        "Jornada", "Título da vaga", "Salário", "Tipo de contrato", 
+                                        "URL_ofertas", "pais", "Licencias de conducir", 'Vehículo', 'descripcion'])
 
-data.rename(columns = {'Area e especializacao profissional': 'descripcion', 'Numero de vagas':'cantidad_de_vacantes', 
-                       'Nivel hierarquico': 'herarquia', 'Localidade':'departamento','Educacion Minima':'educacion_minima',
+data.rename(columns = {'Area e especializacao profissional': 'especialidad', 'Numero de vagas':'cantidad_de_vacantes', 
+                       'Nivel hierarquico': 'jerarquia', 'Localidade':'departamento','Educacion Minima':'educacion_minima',
                        'Empleador':'empresa', 'Idiomas':'idiomas','Jornada':'jornada', 'Título da vaga':'puesto', 
-                       'Salário':'salario', 'Tipo de contrato':'tipo_de_cotrato', 'URL_ofertas':'url_oferta'}, inplace = True)
-   
+                       'Salário':'salario', 'Tipo de contrato':'tipo_de_contrato', 'URL_ofertas':'url_oferta',
+                       'Licencias de conducir':'licencia_conducir', 'Vehículo': 'vehiculo', 'descripcion':'descripcion'}, inplace = True)
+
 data['date'] = date.today()
 country = ('bra')
 data['pais'] = country
