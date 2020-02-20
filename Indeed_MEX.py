@@ -99,15 +99,15 @@ for line in URL_ofertas:
     #Nombre del puesto y local (departamento)
     try:
         aux = soup.find(class_="icl-u-xs-mb--xs icl-u-xs-mt--none jobsearch-JobInfoHeader-title").text.strip()
-        detalle["Puesto"] = re.sub("\r|\n|\s\s+",'',aux)
+        detalle["puesto"] = re.sub("\r|\n|\s\s+",'',aux)
     except:
         pass
     try:
-        detalle["Estado"] = soup.find(class_="jobsearch-JobMetadataHeader-iconLabel").text.strip()
+        detalle["localidad"] = soup.find(class_="jobsearch-JobMetadataHeader-iconLabel").text.strip()
     except:
         pass
     try:
-        detalle["Empleador"] = soup.find(class_ = 'icl-u-lg-mr--sm icl-u-xs-mr--xs').text.strip()
+        detalle["empresa"] = soup.find(class_ = 'icl-u-lg-mr--sm icl-u-xs-mr--xs').text.strip()
     except:
         pass
     try:
@@ -116,6 +116,15 @@ for line in URL_ofertas:
         detalle["data_online"] = detalle["data_online"][1].strip()
     except:
         pass
+    
+        try:
+        components = soup.find(name = "jobDescriptionText",class_ = 'jobsearch-jobDescriptionText')
+        for element in components.find_all("b"):
+            a, b = element.text.split(":")
+            detalle[text_to_unicode(a)] =text_to_unicode(b)
+    except:
+        pass
+
     
     details.append(detalle)
   
