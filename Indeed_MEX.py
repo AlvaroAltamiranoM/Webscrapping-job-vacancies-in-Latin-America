@@ -117,13 +117,14 @@ for line in URL_ofertas:
     except:
         pass
     
-        try:
-        components = soup.find(name = "jobDescriptionText",class_ = 'jobsearch-jobDescriptionText')
-        for element in components.find_all("b"):
-            a, b = element.text.split(":")
+    components = soup.find(class_ = 'jobsearch-jobDescriptionText')
+    for element in components.find_all('div'):
+        try:     
+            temp = element.text.strip()
+            a,b = temp.split(':')
             detalle[text_to_unicode(a)] =text_to_unicode(b)
-    except:
-        pass
+        except:
+            pass
 
     
     details.append(detalle)
