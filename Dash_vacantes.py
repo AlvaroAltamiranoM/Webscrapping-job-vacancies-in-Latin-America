@@ -14,6 +14,10 @@ from dash.dependencies import Input, Output
 import dash_table
 import pandas as pd
 import numpy as np
+import plotly
+import plotly.graph_objs as go
+from plotly.offline import plot
+import random
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -36,6 +40,9 @@ table = pd.pivot_table(Data_test,
 anuncios_estado = Data_test.groupby(['localidad'])['url_oferta'].count()
 anuncios_estado = anuncios_estado.nlargest(10).sort_values(ascending=False)
 
+empresas = Data_test['empresa'].value_counts()
+empresas = empresas.nlargest(30).sort_values(ascending=False)
+
 table['Estados']= table.index
 table = table.nlargest(10, 'url_oferta').sort_values('url_oferta', ascending=False)
 
@@ -48,6 +55,21 @@ table['Años de experiencia (en media)']= table['Años de experiencia (en media)
 table = table.reindex(['Estados','Total de anuncios', 'Mediana salarial','Años de experiencia (en media)', 
                        'Rango de edad requerido (moda)','Tamaño de empresas (moda)'], axis=1)
 
+words = empresas.index
+lenth = len(words)
+colors = [plotly.colors.DEFAULT_PLOTLY_COLORS[random.randrange(1, 10)] for i in range(30)]
+weights = empresas.values/80
+
+data = go.Scatter(x=[random.random() for i in range(30)],
+                 y=random.choices(range(30), k=30),
+                 mode='text',
+                 text=words,
+                 marker={'opacity': 0.3},
+                 textfont={'size': weights,
+                           'color': colors})
+layout = go.Layout({'xaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False},
+                    'yaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False}}, title = 'Nube de palabras de la empresa')
+fig = go.Figure(data=[data], layout=layout)
 
 #for estado in anuncios_estado['localidad']:
  #   anuncios_estado = anuncios_estado['url_oferta'].nlargest(10).sort_values(ascending=False)
@@ -57,29 +79,38 @@ app.layout = html.Div(children=[
     style={'textAlign': 'center'
             }
     ),
-    html.Div(children='Vacantes publicadas en portales de empleo',
+    html.Div(children='Seleccione un mes y Estado de interés',
     style={'textAlign': 'center'
             },
 ),
-
+    html.Div([
+        dcc.Dropdown(
+            id='xaxis-column',
+            options=[{'label': i, 'value': i} for i in table.Estados],
+            value='Ciudad de México DF', 
+            style={'width': '48%', 'display': 'inline-block',
+                                   'marginTop': '1em','marginBottom': '1em',
+                                  'marginRigth': '1em', 'marginLeft': '1em'}),
+        dcc.Dropdown(
+            id='yaxis-column',
+            options=[{'label': i, 'value': i} for i in Data_test.date.unique()],
+            value='Enero', style={'width': '48%', 'display': 'inline-block',
+                                  'marginTop': '1em','marginBottom': '1em',
+                                  'marginRigth': '1em', 'marginLeft': '1em'}),
+        ]),
+    
     dcc.Graph(
-        id='example-graph',
+        id='graph1',
         figure={
             'data': [{'x': anuncios_estado.index,  'y': anuncios_estado, 'type': 'bar', 'name': 'México',
                  },
              ],
-            'layout': {'title': 'Número de vacantes por Estado'}
+            'layout': {'title': 'Número de vacantes por Portal'}
             },
-            style={'width': '1000', 'display': 'inline-block'}),
+            style={'width': '48%', 'display': 'inline-block'}),
         
-        dcc.Graph(
-        figure= {
-                'data': [{'x': anuncios_estado.index,  'y': anuncios_estado, 'type': 'bar', 'name': 'México',
-                         },
-                         ],
-        'layout': {'title': 'Número de vacantes por Estado'}
-        }, 
-        style={'width': '1000', 'display': 'inline-block'}),
+        dcc.Graph(id='graph2',figure = fig,
+                  style={'width': '48%', 'display': 'inline-block'}),
 
     dash_table.DataTable(
             style_data={
@@ -88,6 +119,7 @@ app.layout = html.Div(children=[
         },
     data=table.to_dict('records'),
         sort_action="native",
+        filter_action='native',
         sort_mode="multi",
         columns=[{'id': c, 'name': c} for c in table.columns],
         style_table={'overflowX': 'scroll'},
@@ -127,20 +159,6 @@ app.layout = html.Div(children=[
     ])
     
 
-"""
-dcc.Input(id = 'input', value = '', type = 'text',
-                  style={'width': '100%', 'display': 'inline-block'}),
-        html.Div(id  = 'output'),
-        
-@app.callback(
-        Output(component_id= 'output', component_property='children'),
-        [Input(component_id= 'input', component_property='value')])
-
-def update_value(input_data):
-            return "Input: {}".format(input_data)
-"""
     
 if __name__ == '__main__':
     app.run_server(debug=False) 
-
-
