@@ -68,7 +68,7 @@ data = go.Scatter(x=[random.random() for i in range(30)],
                  textfont={'size': weights,
                            'color': colors})
 layout = go.Layout({'xaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False},
-                    'yaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False}}, title = 'Nube de palabras de la empresa')
+                    'yaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False}}, title = 'Principales empresas')
 fig = go.Figure(data=[data], layout=layout)
 
 #for estado in anuncios_estado['localidad']:
@@ -79,7 +79,7 @@ app.layout = html.Div(children=[
     style={'textAlign': 'center'
             }
     ),
-    html.Div(children='Seleccione un mes y Estado de interés',
+    html.H3(children='Tablero-resumen de vacantes en línea',
     style={'textAlign': 'center'
             },
 ),
@@ -87,17 +87,18 @@ app.layout = html.Div(children=[
         dcc.Dropdown(
             id='xaxis-column',
             options=[{'label': i, 'value': i} for i in table.Estados],
-            value='Ciudad de México DF', 
-            style={'width': '48%', 'display': 'inline-block',
-                                   'marginTop': '1em','marginBottom': '1em',
-                                  'marginRigth': '1em', 'marginLeft': '1em'}),
+            placeholder='Seleccione un Estado',
+                            style={'width': '58%', 'display': 'inline-block',
+                                   'marginTop': '1em','marginBottom': '1em'
+                                  }),
         dcc.Dropdown(
             id='yaxis-column',
             options=[{'label': i, 'value': i} for i in Data_test.date.unique()],
-            value='Enero', style={'width': '48%', 'display': 'inline-block',
-                                  'marginTop': '1em','marginBottom': '1em',
-                                  'marginRigth': '1em', 'marginLeft': '1em'}),
-        ]),
+            placeholder='Seleccione un Estado', 
+                            style={'width': '58%', 'display': 'inline-block',
+                                  'marginTop': '1em','marginBottom': '1em'}),
+        ],
+             style=dict(display='flex')),
     
     dcc.Graph(
         id='graph1',
@@ -111,6 +112,11 @@ app.layout = html.Div(children=[
         
         dcc.Graph(id='graph2',figure = fig,
                   style={'width': '48%', 'display': 'inline-block'}),
+
+
+    html.H5(children='Resumen de principales variables por ciudad',
+    style={'textAlign': 'left'
+            }),
 
     dash_table.DataTable(
             style_data={
@@ -162,3 +168,5 @@ app.layout = html.Div(children=[
     
 if __name__ == '__main__':
     app.run_server(debug=False) 
+
+
