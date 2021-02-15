@@ -13,7 +13,7 @@ from time import sleep
 import re
 from datetime import date
 import urllib
-from ingest.utils import *
+import utils
 
 headers = {
     'authority': 'www.computrabajo.com',
@@ -30,9 +30,29 @@ headers = {
 }
 
 
-countries = ['ni', 'uy', 'py', 'bo', 'do', 'cr', 'hn', 'pa', 'gt', 'sv', 've', 'ec', 'cl', 'ar', 'pe', 'co', 'mx']
+#countries = ['ni', 'uy', 'py', 'bo', 'do', 'cr', 'hn', 'pa', 'gt', 'sv', 've', 'ec', 'cl', 'ar', 'pe', 'co', 'mx']
+
+
 items_perpage = 20
+""""
+baseline_date = '2019-12-18'
+countries = ['ni', 'uy', 'py', 'bo', 'do', 'cr', 'hn', 'pa', 'gt', 'sv', 'pe']
+
+baseline_date = '2019-12-20'
+countries = ['ec', 'cl', 've']
 baseline_date = '2019-12-22'
+countries = ['mx']
+baseline_date = '2019-12-21'
+countries = ['ar']
+baseline_date = '2019-12-21'
+countries = ['co']
+"""
+
+baseline_date = '2019-12-18'
+countries = ['ni']
+
+
+
 
 for country in countries:
     jobs = []
@@ -69,8 +89,8 @@ for country in countries:
     Ofertas_Activas = soup.find(class_ = "breadtitle_mvl").text
     Ofertas_Activas = int(''.join(filter(str.isdigit, Ofertas_Activas)))
 
-    #for pages in range(12,13):
-    for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
+    for pages in range(12,13):
+    #for pages in range(1,int((Ofertas_Activas/items_perpage)+2)):
         if country == 'cr':
             URL = 'https://www.computrabajo.co.cr/ofertas-de-trabajo/?p='+format(pages)
         elif country == "sv":
