@@ -8,9 +8,9 @@ Online job portals offer timely, granular signals on labor demand, but in Latin 
 
 ## Data
 
-- Weekly scraping of online vacancies across 18 LAC countries since Q4 2019
+- ~3 million job postings scraped across 18 LAC countries, collected weekly from late 2019 to early 2022
 - Country-level datasets with ~15 standardized variables each (title, description, economic activity, location, education, salary, contract type, dates, and others)
-- Raw postings stored per country and consolidated into a unified relational schema
+- Raw postings consolidated per country into a unified relational schema
 
 ## Method
 
@@ -33,4 +33,3 @@ Online job portals offer timely, granular signals on labor demand, but in Latin 
 ## Context
 
 Developed for labor market research at the IDB and World Bank, applying online job-ad data to questions that standard household and firm surveys answer with delay.
-
