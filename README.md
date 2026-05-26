@@ -25,11 +25,7 @@ Online job portals offer timely, granular signals on labor demand, but in Latin 
 - Constructing high-frequency labor demand indicators where official statistics lag
 - Tracking skill-requirement shifts across occupations over time
 - Validating online vacancy data against official surveys before using it for policy analysis
-
-## Stack
-
-`Python` | `BeautifulSoup` | `pandas` | `NLP` | `scikit-learn` | `TF-IDF / cosine similarity` | `K-means`
-
+  
 ## Context
 
 Developed for labor market research at the IDB and World Bank, applying online job-ad data to questions that standard household and firm surveys answer with delay.
